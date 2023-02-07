@@ -1,0 +1,189 @@
+cell_types:
+    CD4+ T cell:
+        positive:
+            - CD3D
+            - CD3E
+            - CD3G
+            - TRAC
+            - CD4
+            - TCF7
+            - CD27
+            - IL7R
+        negative:
+            - CD8A
+            - CD8B
+            - GNLY
+            - NKG7
+            - CST7
+        
+    Cytotoxic T cell:
+        positive:
+            - CD3D
+            - CD3E
+            - CD3G
+            - TRAC
+            - CD8A
+            - CD8B
+            - GZMK
+            - CCL5
+            - NKG7
+        negative:
+            - CD4
+            - FCER1G
+    
+    B cell:
+        positive:
+            - CD19
+            - MS4A1
+            - CD79A
+            - CD79B
+            - MZB1
+            - IGHD
+            - IGHM
+    
+    Natural killer cell:
+        positive:
+            - NCAM1
+            - NKG7
+            - KLRB1
+            - KLRD1
+            - KLRF1
+            - KLRC1
+            - KLRC2
+            - KLRC3
+            - KLRC4
+            - FCGR3A
+            - FCGR3B
+            - ITGAL
+            - ITGAM
+            - FCER1G
+        negative:
+            - CD3D
+            - CD3E
+            - CD3G
+            - CD14
+            - TRAC
+
+    CD14+ monocyte:
+        positive:
+            - VCAN
+            - FCN1
+            - S100A8
+            - S100A9
+            - CD14
+            - ITGAL
+            - ITGAM
+            - CSF3R
+            - CSF1R
+            - CX3CR1
+            - TYROBP
+            - LYZ
+            - S100A12
+        negative:
+            - FCGR3A
+            - FCGR3B
+            - CD3D
+            - CD3E
+            - CD3G
+            - TRAC
+            - NKG7
+            - KLRB1
+            - KLRD1
+
+    CD16+ monocyte:
+      positive:
+        - FCN1
+        - FCGR3A
+        - FCGR3B
+        - ITGAL
+        - ITGAM
+        - CSF3R
+        - CSF1R
+        - CX3CR1
+        - CDKN1C
+        - MS4A7
+      negative:
+        - S100A8
+        - S100A9
+        - S100A12
+        - CD14
+        - CD3D
+        - CD3E
+        - CD3G
+        - TRAC
+        - NKG7
+        - KLRB1
+        - KLRD1
+
+    Dendritic cell:
+      positive:
+        - HLA-DPB1
+        - HLA-DPA1
+        - HLA-DQA1
+        - ITGAX
+        - CD1C
+        - CD1E
+        - FCER1A
+        - CLEC10A
+        - FCGR2B
+      negative:
+        - CD3D
+        - CD3E
+        - CD3G
+        - NCAM1
+        - CD19
+        - CD14
+        - MS4A1
+        - CD79A
+        - CD79B
+
+    Plasmacytoid dendritic cell:
+      positive:
+        - IL3RA
+        - GZMB
+        - JCHAIN
+        - IRF7
+        - TCF4
+        - LILRA4
+        - CLEC4C
+      negative:
+        - ITGAX
+        - CD3D
+        - CD3E
+        - CD3G
+        - NCAM1
+        - CD19
+        - CD14
+        - MS4A1
+        - CD79A
+        - CD79B
+
+    Megakaryocyte:
+      positive:
+        - PF4
+        - PPBP
+        - GP5
+        - ITGA2B
+        - NRGN
+        - TUBB1
+        - SPARC
+        - RGS18
+        - MYL9
+        - GNG11
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+

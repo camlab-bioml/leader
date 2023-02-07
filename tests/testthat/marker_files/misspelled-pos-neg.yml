@@ -1,0 +1,7 @@
+cell_types:
+  CD4+ T cell:
+    Positive:
+      - CD3
+      - CD4
+    Negative:
+      - CD8
