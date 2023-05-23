@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.R
 \name{cluster_enrich}
 \alias{cluster_enrich}
-\title{calculates the enrichment of marker genes in each cluster}
+\title{calculates the average expression of marker genes in each cluster}
 \usage{
 cluster_enrich(markers, expression)
 }
@@ -12,5 +12,5 @@ cluster_enrich(markers, expression)
 \item{expression}{dataframe with expression values for all cells and marker genes. rows are cells, columns are markers. The first column should be \code{cell_id}.}
 }
 \description{
-calculates the enrichment of marker genes in each cluster
+calculates the average expression of marker genes in each cluster
 }

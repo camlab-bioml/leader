@@ -21,7 +21,7 @@ adaptive_reweighting(
 
 \item{n_requested_cells}{Number of cells to sample from dataset. Cannot be bigger than total number of cells in \code{seu}.}
 
-\item{mode}{Either \code{marker_based} or \code{cluster_based}. When marker_based is selected, cells are sampled from aggregated clusters that have been putatively assigned to a cell type using gene set enrichment analyses. When cluster_based is used cells are sampled from the individual clusters.}
+\item{mode}{Either \code{marker_based} or \code{cluster_based}. When marker_based is selected, cells are sampled from aggregated clusters that have been putatively assigned to a cell type based on the average gene expression. When cluster_based is used cells are sampled from the individual clusters.}
 
 \item{n_of_pcs}{Defines the number of PCA dimensions to use for clustering. Defaults to 30.}
 
