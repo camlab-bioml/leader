@@ -1,0 +1,15 @@
+citEntry(entry="article",
+         title = "The impacts of active and semi-supervised learning on efficient annotation of single-cell expression data",
+         author = personList( as.person("Michael J. Geuenich"),
+                              as.person("Doe-won Gong"),
+                              as.person("Kieran R. Campbell")),
+         year = 2023,
+         journal = "",
+         doi = "",
+         volume =,
+         issue =,
+         pages =,
+         textVersion = 
+         paste("Geuenich, M.J., Gong, D. Campbell, K.R.", 
+               "The impacts of active and semi-supervised learning on efficient annotation of single-cell expression data",
+                "" ) )
