@@ -1,12 +1,10 @@
 Package: leader
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Cell Selection Method to Generate more Balanced Datasets
+Version: 0.99.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Michael", "Geuenich", , "m.geuenich@mail.utoronto.ca", role = c("aut", "cre"), comment = c(ORCID = "0009-0001-8211-3070"))
+Description: Implementation of adaptive reweighing, a method to generate balanced datasets from single cell data. Given a dataset, it samples cells from clusters. This can be done in a marker aware fashion, where prior knowledge of cell type marker genes is used or in a cell type marker independent manner.
+License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
@@ -21,4 +19,6 @@ Suggests:
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
-LazyData: true
+LazyData: false
+biocViews: Clustering, SingleCell, Annotation
+BugReports: https://github.com/camlab-bioml/leader
