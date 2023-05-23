@@ -6,6 +6,7 @@
 #'
 #' @importFrom yaml read_yaml
 #' @importFrom dplyr bind_rows
+#' @export
 get_markers <- function(yaml_path){
   if(!file.exists(yaml_path)){
     stop("Error: it looks like the marker file does not exist in the directory specified.")
@@ -103,12 +104,13 @@ get_markers <- function(yaml_path){
   markers
 }
 
+
 #' Select cells using adaptive reweighting.
 #'
 #' @param seu A processed \code{Seurat} object (must be normalized, the most variable features should have already been found using \code{FindVariableFeatures} and should be scaled using \code{ScaleData})
 #' @param markers A \code{yaml} file with the set of markers to be used. The name of the marker must match that in \code{seu}, else an error is thrown.
 #' @param n_requested_cells Number of cells to sample from dataset. Cannot be bigger than total number of cells in `seu`.
-#' @param mode Either \code{marker_based} or \code{cluster_based}. When marker_based is selected, cells are sampled from aggregated clusters that have been putatively assigned to a cell type using gene set enrichment analyses. When cluster_based is used cells are sampled from the individual clusters.
+#' @param mode Either \code{marker_based} or \code{cluster_based}. When marker_based is selected, cells are sampled from aggregated clusters that have been putatively assigned to a cell type based on the average gene expression. When cluster_based is used cells are sampled from the individual clusters.
 #' @param n_of_pcs Defines the number of PCA dimensions to use for clustering. Defaults to 30.
 #' @param knn Defines the number of k for the k-nearest neighbor algorithm during clustering. Defaults to 20.
 #' @param res Defines the clustering resulution. Defaults to 0.8.
@@ -141,18 +143,31 @@ adaptive_reweighting <- function(seu, markers, n_requested_cells,
 
 #' Creates PCA embedding if missing, clusters cells and returns a cluster - cell id mapping.
 #' @returns A dataframe with two columns: cell_id and cluster_id for each cell.
-#' @importFrom Seurat RunPCA FindNeighbors FindClusters
+#' @importFrom Seurat RunPCA FindNeighbors FindClusters VariableFeatures Idents
 #' @importFrom tibble rownames_to_column
 seurat_cluster <- function(seu, n_of_pcs, knn, res){
-  # Check if the number of PC's requested is higher than
+  # Check if the number of PC's requested is higher than the number of features/cells
   n_features <- length(seu@assays[[1]]@var.features)
-  if(n_of_pcs > n_features){
-    warning("The number of selected principal components is larger than the number of features in the dataset. Using the total number of features of the dataset.")
-    n_of_pcs <- n_features
-  }
-
+  n_cells <- nrow(seu@meta.data)
+  
+  # If PCA has not been computed go ahead now
   if(!('pca' %in% names(seu@reductions))){
-    seu <- RunPCA(seu, features = VariableFeatures(object = seu))
+    # use min(n_features, n_cells) as npcs if requested higher
+    if(n_of_pcs > n_features | n_of_pcs > n_cells){
+      n_of_pcs <- min(n_features, n_cells) - 1
+      warning(paste("The number of selected principal components is larger than the number of features or cells in the dataset. Computing", n_of_pcs, "total PCs."))
+    }
+    seu <- RunPCA(seu, npcs = n_of_pcs, features = VariableFeatures(object = seu))
+  }
+  # If the number of PCs requested is higher than that calculated in existing PCA
+  # calculate pca embedding again
+  else if(ncol(seu@reductions$pca@feature.loadings) < n_of_pcs){
+    # use min(n_features, n_cells) as npcs if requested higher
+    if(n_of_pcs > n_features | n_of_pcs > n_cells){
+      n_of_pcs <- min(n_features, n_cells) - 1
+      warning(paste("The number of selected principal components is larger than the number of features or cells in the dataset. Computing", n_of_pcs, "total PCs."))
+    }
+    seu <- RunPCA(seu, npcs = n_of_pcs, features = VariableFeatures(object = seu))
   }
 
   seu <- FindNeighbors(seu, dims = 1:n_of_pcs, k.param = knn)
@@ -175,6 +190,7 @@ seurat_cluster <- function(seu, n_of_pcs, knn, res){
 #' @importFrom splitstackshape stratified
 #' @importFrom dplyr pull
 #' @importFrom tibble as_tibble
+#' @importFrom dplyr slice_head tally
 sample_cells <- function(cluster_output, n_requested_cells){
   n_cells <- 0
 
@@ -226,7 +242,7 @@ sample_cells <- function(cluster_output, n_requested_cells){
   as_tibble(selected_cells)
 }
 
-#' Runs geneset enrichment analysis to identify overlapping clusters
+#' Takes into account average marker gene expression to identify overlapping clusters
 #' @param seu a seurat object
 #' @param markers an object with cell type markers read in by get_markers()
 #' @param cluster_output
@@ -257,7 +273,7 @@ reweighting <- function(seu, markers, cluster_output){
 }
 
 
-#' calculates the enrichment of marker genes in each cluster
+#' calculates the average expression of marker genes in each cluster
 #' @param markers an object with cell type markers read in by get_markers()
 #' @param expression dataframe with expression values for all cells and marker genes. rows are cells, columns are markers. The first column should be `cell_id`.
 #'
@@ -301,102 +317,3 @@ cluster_enrich <- function(markers, expression){
 
   cluster_assignments
 }
-
-
-
-# while(n_cells < req_cells){
-#   pred_cell_types <- seu$predicted_cell_type %>%
-#     unique() %>%
-#     length()
-#
-#   if(exists("sce_subset")){
-#     no_to_select <- ceiling((req_cells - ncol(sce_subset)) / pred_cell_types)
-#   }else{
-#     no_to_select <- ceiling(req_cells / pred_cell_types)
-#   }
-#
-#   subset <- stratified(seu, "predicted_cell_type", no_to_select) |>
-#     pull(cell_id)
-#
-#   n_cells <- n_cells + length(subset)
-#   oversampled <- n_cells - req_cells
-#   if(oversampled > 0){
-#     subset <- subset[-sample(1:length(subset), oversampled)]
-#   }
-#
-#   if(exists("sce_subset")){
-#     sce_subset <- cbind(sce_subset, sce[, colnames(sce) %in% subset])
-#   }else{
-#     sce_subset <- sce[, colnames(sce) %in% subset]
-#   }
-#   seu <- filter(seu, !(cell_id %in% colnames(sce_subset)))
-# }
-
-
-
-### Possible issues
-# - what happens when the number of PCs selected is higher than the dimensionality of the dataset?
-
-
-### Questions
-# - what is the best way to select an assay from a seurat object?
-
-# #
-# # # library(Seurat)
-# sce <- readRDS("../2021-whatsthatcell-analysis-Michael/data/scRNASeq/scRNASeq-train-seed-0.rds")
-# mat <- assays(sce)$counts
-# colnames(mat) <- colnames(sce)
-# seu <- CreateSeuratObject(counts = assays(sce)$counts)
-# seu <- NormalizeData(seu)
-#
-# seu <- FindVariableFeatures(seu, selection.method = 'vst', nfeatures = 2000)
-#
-# all.genes <- rownames(seu)
-# seu <- ScaleData(seu, features = all.genes)
-
-
-
-
-
-#' library(tibble)
-#' library(dplyr)
-#' library(yaml)
-#' markers <- read_yaml("../2021-whatsthatcell-analysis-Michael/markers/scRNASeq.yml")$cell_types
-#' unique_markers <- unlist(markers) |>unique()
-#'
-#' sce <- readRDS("../2021-whatsthatcell-analysis-Michael/data/scRNASeq/scRNASeq-train.rds")
-#' seu <- CreateSeuratObject(counts = assays(sce)$logcounts)
-#' seu <- FindVariableFeatures(seu, selection.method = 'vst', nfeatures = 2000)
-#'
-#' all.genes <- rownames(seu)
-#' seu <- ScaleData(seu, features = all.genes)
-#'
-#'
-#' seu <- RunPCA(seu, features = VariableFeatures(object = seu))
-#'
-#' ### [CLUSTERING] ###
-#' n_of_pcs <- 30
-#' seu <- FindNeighbors(seu, dims = 1:n_of_pcs, k.param = 20)
-#' seu <- FindClusters(seu, resolution = 1.2)
-#'
-#' # First UMAP viz
-#' seu <- RunUMAP(seu, dims = 1:10)
-#' DimPlot(seu, reduction = 'umap')
-#'
-#' # Get clusters
-#' clusters <- Idents(seu) |>
-#'   as.data.frame() |>
-#'   rownames_to_column('cell_id') |>
-#'   rename(cluster = 'Idents(seu)')
-#'
-#' # Get expression
-#' expression <- seu@assays$RNA@counts %>%
-#'   as.matrix() |>t() %>%
-#'   as.data.frame() %>%
-#'   rownames_to_column('cell_id')
-#'
-#' expression <- expression[, c('cell_id', unique_markers)] %>%
-#'   left_join(clusters) %>%
-#'   select(-cell_id)
-
-
