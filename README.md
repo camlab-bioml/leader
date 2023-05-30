@@ -8,7 +8,8 @@ Leader generates subsampled datasets by clustering all cells and selecting the d
 
 ## Installing leader
 ```
-BiocManager::install("leader")
+install.packages("devtools")
+devtools::install_github("camlab-bioml/leader")
 ```
 
 ## Running leader
